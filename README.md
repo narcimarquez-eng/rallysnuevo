@@ -38,4 +38,6 @@ node scripts/actualizar-mundos.mjs --con-assets
 
 ## Compatibilidad con `Hacer-coches-`
 
-Cualquier `.glb` exportado desde `narcimarquez-eng/Hacer-coches-` usa metros reales, `+Z` hacia delante, `+Y` arriba, `Y = 0` en la base de los neumáticos y el grupo `Wheels` con 4 nodos `Wheel`. El juego detecta las 4 ruedas, las envuelve con pivotes independientes de dirección, suspensión y rodadura, y coloca automáticamente las cámaras de **capó** y **cabina** frente al parabrisas y volante.
+El juego incluye los **5 coches del garaje real** de `narcimarquez-eng/Hacer-coches-` (`Urban Speedster`, `Baja 4x4`, `Cyber Wedge`, `Gran Turismo Royale` y `Phantom V8`), extraídos directamente de `parametric_car.html` a `vendor/hacer-coches/motor-coches.js` (actualizable con `npm run actualizar-coches`).
+
+Además, cualquier `.glb` exportado desde `narcimarquez-eng/Hacer-coches-` usa metros reales, `+Z` hacia delante, `+Y` arriba, `Y = 0` en la base de los neumáticos y el grupo `Wheels` con 4 nodos `Wheel`. El juego detecta las 4 ruedas, las envuelve con pivotes independientes de dirección, suspensión y rodadura, y coloca automáticamente las cámaras de **capó** y **cabina** frente al parabrisas y volante.

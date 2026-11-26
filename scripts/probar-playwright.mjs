@@ -159,6 +159,19 @@ async function main() {
     await page.keyboard.up('KeyW');
     console.log('✓ 07-camara-cabina.png');
 
+    // Cambiar de coche del garaje (Baja 4x4) para verificar también el segundo modelo real de Hacer-coches-
+    await page.click('#btn-menu');
+    await page.click('.tarjeta-coche[data-id="offroad"]');
+    await page.click('#btn-correr');
+    await page.evaluate(() => {
+      window.__RALLY__.empezarSinCuenta();
+      window.__RALLY__.setCamara('persecucion');
+    });
+    await page.keyboard.down('KeyW');
+    await page.waitForFunction(() => window.__RALLY__.estado().fisica.velocidadKmh > 20, null, { timeout: 10000 });
+    await page.keyboard.up('KeyW');
+    console.log('✓ Segundo coche de Hacer-coches- (offroad) probado');
+
     // 9. Probar importación real de .glb estilo Hacer-coches-
     const resGlb = await page.evaluate(async () => {
       const THREE = await import('three');

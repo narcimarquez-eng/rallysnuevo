@@ -6,6 +6,7 @@
   "description": "Juego 3D de rallys sin compilación con escenarios de Mundos- y coches de Hacer-coches-",
   "scripts": {
     "actualizar-mundos": "node scripts/actualizar-mundos.mjs",
+    "actualizar-coches": "node scripts/actualizar-coches.mjs",
     "servir": "node scripts/servidor.mjs",
     "probar": "node scripts/probar-playwright.mjs"
   },

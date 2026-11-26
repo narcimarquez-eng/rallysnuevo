@@ -1,5 +1,6 @@
 // Punto de entrada de Rallys divertidos: une Escena3D (Mundos-), coches (Hacer-coches-), física, carrera y HUD.
 import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { Escena3D } from '../vendor/mundos/js/escena-3d.js';
 import {
   ESCENARIOS_PREDEFINIDOS,
@@ -76,6 +77,10 @@ renderer.toneMappingExposure = 1.05;
 dom.lienzo.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 0.65;
+pmrem.dispose();
 const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.25, 6500);
 
 let modelosEmbebidos = {};
