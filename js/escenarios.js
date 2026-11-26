@@ -4,24 +4,38 @@ const E = window.Escenario;
 export const ESCENARIOS_PREDEFINIDOS = [
   {
     id: 'rally-7711',
-    nombre: 'Villarrally · Circuito Clásico',
+    nombre: 'Villarrally · Pueblo Andaluz',
     descripcion: 'Grava, tramo de asfalto, barro, pueblo andaluz con su iglesia, 2 puentes y vado.',
     plantilla: 'rally',
     semilla: 7711
   },
   {
-    id: 'rally-2026',
-    nombre: 'Sierra del Sur · Vado y Puentes',
-    descripcion: 'Colinas rápidas con curvas enlazadas, vado ancho, 2 puentes y paso por pueblo.',
-    plantilla: 'rally',
-    semilla: 2026
+    id: 'rally-sierra',
+    nombre: 'Sierra Nevada · Nieve y Hielo',
+    descripcion: 'Puerto alpino nevado con asfalto, tramos de nieve y grava, aldea nórdica, puente y vado.',
+    plantilla: 'rally_sierra',
+    semilla: 1024
   },
   {
-    id: 'rally-9103',
-    nombre: 'Vado del Valle · Tramo Técnico',
-    descripcion: 'Trazado técnico entre bosques, lagos, 2 puentes y zonas de derrape.',
-    plantilla: 'rally',
-    semilla: 9103
+    id: 'rally-desierto',
+    nombre: 'Cañón del Desierto · Raid Dakar',
+    descripcion: 'Atardecer dorado entre dunas, arena, tierra roja, rocas ocres, oasis y poblado.',
+    plantilla: 'rally_desierto',
+    semilla: 1024
+  },
+  {
+    id: 'rally-otono',
+    nombre: 'Bosque de Otoño · Asfalto y Barro',
+    descripcion: 'Tarde otoñal entre bosques rojizos, asfalto rápido, zonas profundas de barro y aldea.',
+    plantilla: 'rally_otono',
+    semilla: 1024
+  },
+  {
+    id: 'rally-costa',
+    nombre: 'Costa Tropical · Acantilados y Muelles',
+    descripcion: 'Isla tropical rodeada de mar con asfalto costero, playa de arena, palmeras y puentes.',
+    plantilla: 'rally_costa',
+    semilla: 1024
   }
 ];
 

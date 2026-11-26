@@ -55,16 +55,16 @@ function adaptarRutas(codigo, nombre) {
     return out;
   }
 
-  // En suelos.js hay que añadir crossOrigin = 'anonymous' para que DataArrayTexture pueda leer pixels con getImageData
-  if (nombre === 'suelos.js') {
+  // En suelos.js hay que añadir crossOrigin = 'anonymous' si no lo trae ya
+  if (nombre === 'suelos.js' && !out.includes("crossOrigin = 'anonymous'")) {
     out = out.replace(
       'const im = new Image();',
       "const im = new Image(); im.crossOrigin = 'anonymous';"
     );
   }
 
-  // En escena-3d.js, resolverRuta resuelve rutas relativas de GLB contra la base de assets de Mundos-
-  if (nombre === 'escena-3d.js') {
+  // En escena-3d.js, resolverRuta ya soporta MUNDOS_ASSETS si viene actualizado; si no, lo añadimos
+  if (nombre === 'escena-3d.js' && !out.includes('globalThis.MUNDOS_ASSETS')) {
     out = out.replace(
       "if (ruta.startsWith('rpg:')) return (this.esc.enlaces.rpgBase || E.RPG_BASE).replace(/\\/?$/, '/') + ruta.slice(4);\n    return ruta;",
       `if (ruta.startsWith('rpg:')) return (this.esc.enlaces.rpgBase || E.RPG_BASE).replace(/\\/?$/, '/') + ruta.slice(4);\n    if (!/^(https?:|blob:|data:|local:|\\/)/i.test(ruta)) return ${PREFIJO_ASSETS} + ruta;\n    return ruta;`

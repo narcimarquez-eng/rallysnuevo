@@ -43,6 +43,7 @@ const dom = {
   chkInvertirGlb: document.getElementById('chk-invertir-glb'),
   infoCoche: document.getElementById('info-coche'),
   selCalidad: document.getElementById('sel-calidad'),
+  selHora: document.getElementById('sel-hora'),
   chkSonido: document.getElementById('chk-sonido'),
   selTactil: document.getElementById('sel-tactil'),
   btnCorrer: document.getElementById('btn-correr'),
@@ -169,6 +170,22 @@ function actualizarVisibilidadTactil() {
   document.body.classList.toggle('con-tactil', Boolean(enCarrera && mostrar));
 }
 
+let ultimoFocoSombra = { x: 1e9, z: 1e9 };
+function actualizarFocoSombra(x, z, forzar = false) {
+  if (!escena3d || !paqueteEscenario) return;
+  if (!forzar && Math.hypot(x - ultimoFocoSombra.x, z - ultimoFocoSombra.z) < 10) return;
+  ultimoFocoSombra = { x, z };
+  const radio = dom.selCalidad.value === 'alta' ? 110 : 85;
+  escena3d.setFoco(x, z, radio);
+}
+
+function aplicarHoraSeleccionada() {
+  if (!escena3d || !paqueteEscenario) return;
+  const val = dom.selHora?.value || 'auto';
+  const h = val === 'auto' ? (paqueteEscenario.escenario.ambiente?.hora ?? 13) : Number(val);
+  escena3d.setHora(h);
+}
+
 // --- Carga de escenarios y coches ---
 function aplicarEscenario(paquete) {
   paqueteEscenario = paquete;
@@ -176,6 +193,7 @@ function aplicarEscenario(paquete) {
   dom.estadoCarga.textContent = 'Construyendo terreno…';
 
   escena3d.construir(paquete.escenario);
+  aplicarHoraSeleccionada();
   circuito = analizarCircuito(paquete.escenario);
   if (circuito.salida?.elemento && escena3d.objetos) {
     const objIni = escena3d.objetos.get(circuito.salida.elemento.id);
@@ -193,6 +211,7 @@ function aplicarEscenario(paquete) {
     cocheActual.actualizarVisual(fisica.estado, 0);
     camaras.reiniciarEn(fisica.estado);
   }
+  actualizarFocoSombra(circuito.salida.x, circuito.salida.z, true);
 
   carrera = new GestorCarrera(circuito, paquete.id, cocheActual ? cocheActual.id : idCocheSeleccionado);
   carreraIniciada = false;
@@ -414,6 +433,8 @@ function inicializarUI() {
     if (paqueteEscenario) aplicarEscenario(paqueteEscenario);
   });
 
+  dom.selHora?.addEventListener('change', aplicarHoraSeleccionada);
+
   dom.chkSonido.addEventListener('change', () => {
     sonido.setActivo(dom.chkSonido.checked);
   });
@@ -520,6 +541,7 @@ function bucle(ahora) {
 
     cocheActual.actualizarVisual(estado, dt);
     camaras.actualizar(dt, estado, cocheActual);
+    actualizarFocoSombra(estado.x, estado.z);
     particulas.actualizarDesdeCoche(dt, estado, cocheActual.medidas);
     sonido.actualizar(estado, entrada.acelerar, false);
 
@@ -605,6 +627,12 @@ window.__RALLY__ = {
     fisica.colocarEn(x, z, rotY);
     cocheActual.actualizarVisual(fisica.estado, 0);
     camaras.reiniciarEn(fisica.estado);
+    actualizarFocoSombra(x, z, true);
+  },
+  cambiarEscenario(id) {
+    dom.selEscenario.value = id;
+    aplicarEscenario(obtenerEscenarioPredefinido(id));
+    return this.estado();
   },
   irAPuente(indice = 0) {
     const pu = mundoFisica?.puentes?.[indice];

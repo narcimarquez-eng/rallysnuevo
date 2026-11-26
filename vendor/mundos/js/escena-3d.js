@@ -755,7 +755,7 @@ export class Escena3D {
     this.sol.castShadow = this.o.calidad !== 'baja';
     const sm = this.o.calidad === 'alta' ? 4096 : 2048;
     this.sol.shadow.mapSize.set(sm, sm);
-    this.sol.shadow.bias = -0.0004; this.sol.shadow.normalBias = 0.6;
+    this.sol.shadow.bias = -0.0003; this.sol.shadow.normalBias = 0.45; this.sol.shadow.radius = 2.5;
     this.scene.add(this.sol, this.sol.target);
     this.hemi = new THREE.HemisphereLight('#cfe3ff', '#5a5040', 0.9);
     this.scene.add(this.hemi);
@@ -780,7 +780,11 @@ export class Escena3D {
     this._entornoPendiente = true;
     if (this.matsAgua) for (const m of this.matsAgua) m.envMapIntensity = 0.12 + 0.22 * dia;
     this.hemi.color.set('#cfe3ff').lerp(new THREE.Color('#33406a'), 1 - dia);
-    const niebla = new THREE.Color('#bcd3e6').lerp(new THREE.Color('#e6a77a'), ocaso).lerp(new THREE.Color('#0c1220'), 1 - dia);
+    const bioma = this.esc && this.esc.terreno && this.esc.terreno.bioma;
+    const sueloHemi = bioma === 'nevado' ? '#9bb2c9' : bioma === 'desierto' ? '#8f724d' : bioma === 'otono' ? '#7a5c3c' : bioma === 'volcanico' ? '#494240' : '#4f6443';
+    this.hemi.groundColor.set(sueloHemi).lerp(new THREE.Color('#161b26'), 1 - dia);
+    const nieblaDia = bioma === 'desierto' ? '#dfd0b8' : bioma === 'nevado' ? '#cfdeec' : bioma === 'otono' ? '#d4c8b4' : '#bcd3e6';
+    const niebla = new THREE.Color(nieblaDia).lerp(new THREE.Color('#e6a77a'), ocaso).lerp(new THREE.Color('#0c1220'), 1 - dia);
     this.scene.fog.color.copy(niebla);
     this.scene.background = niebla.clone();
     this.cielo.visible = dia > 0.02;
@@ -1203,7 +1207,8 @@ export class Escena3D {
   // ruta: 'local:<id>' (importado, en IndexedDB), 'rpg:<ruta>' (biblioteca del Creador RPG) o una URL
   resolverRuta(ruta) {
     if (ruta.startsWith('rpg:')) return (this.esc.enlaces.rpgBase || E.RPG_BASE).replace(/\/?$/, '/') + ruta.slice(4);
-    if (!/^(https?:|blob:|data:|local:|\/)/i.test(ruta)) return (globalThis.MUNDOS_ASSETS || 'https://narcimarquez-eng.github.io/Mundos-/') + ruta;
+    const base = this.o.baseAssets != null ? this.o.baseAssets : (globalThis.MUNDOS_ASSETS || '');
+    if (base && !/^(https?:|blob:|data:|local:|\/)/i.test(ruta)) return base + ruta;
     return ruta;
   }
   cargarModelo(ruta) {

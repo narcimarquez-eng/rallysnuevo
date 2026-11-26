@@ -241,6 +241,36 @@ async function main() {
     await page.keyboard.up('KeyW');
     console.log('✓ 08-carga-glb-hacercoches.png');
 
+    // 10-13. Probar los 4 nuevos escenarios temáticos de Mundos- con Aleatorio realista y sombras dinámicas
+    const nuevosEscenarios = [
+      ['rally-sierra', '10-sierra-nevada.png'],
+      ['rally-desierto', '11-desierto-dakar.png'],
+      ['rally-otono', '12-bosque-otono.png'],
+      ['rally-costa', '13-costa-tropical.png']
+    ];
+    for (const [idEsc, archivo] of nuevosEscenarios) {
+      await page.evaluate(id => {
+        window.__RALLY__.cambiarEscenario(id);
+        window.__RALLY__.generarAleatorioRealista();
+        window.__RALLY__.empezarSinCuenta();
+        window.__RALLY__.setCamara('persecucion');
+      }, idEsc);
+      await page.waitForTimeout(1200);
+      await page.keyboard.down('KeyW');
+      await page.waitForFunction(() => window.__RALLY__.estado().fisica.velocidadKmh > 25, null, { timeout: 10000 });
+      await page.keyboard.down('KeyD');
+      await page.waitForTimeout(350);
+      const estEsc = await page.evaluate(() => window.__RALLY__.estado());
+      console.log(`  Escenario ${idEsc}: vel=${estEsc.fisica.velocidadKmh.toFixed(1)} km/h | sup=${estEsc.fisica.superficie} | y=${estEsc.fisica.y.toFixed(1)}`);
+      if (idEsc === 'rally-costa' && estEsc.fisica.y < 1.0) {
+        throw new Error('rally-costa arrancó bajo el nivel del mar: y=' + estEsc.fisica.y);
+      }
+      await page.screenshot({ path: path.join(DIR_CAPTURAS, archivo) });
+      await page.keyboard.up('KeyD');
+      await page.keyboard.up('KeyW');
+      console.log('✓ ' + archivo);
+    }
+
     await context.close();
 
     // 10. Contexto móvil apaisado con controles táctiles

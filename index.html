@@ -72,7 +72,7 @@
       <!-- Ajustes -->
       <section class="barra-ajustes">
         <label class="ajuste">
-          <span>Calidad gráfica</span>
+          <span>Calidad</span>
           <select id="sel-calidad">
             <option value="baja">Baja</option>
             <option value="media" selected>Media</option>
@@ -80,11 +80,20 @@
           </select>
         </label>
         <label class="ajuste">
+          <span>Hora</span>
+          <select id="sel-hora">
+            <option value="auto" selected>Del escenario</option>
+            <option value="7.6">Amanecer</option>
+            <option value="12.5">Mediodía</option>
+            <option value="17.0">Atardecer</option>
+          </select>
+        </label>
+        <label class="ajuste">
           <span>Sonido</span>
           <input type="checkbox" id="chk-sonido" checked>
         </label>
         <label class="ajuste">
-          <span>Controles táctiles</span>
+          <span>Táctil</span>
           <select id="sel-tactil">
             <option value="auto" selected>Automático</option>
             <option value="si">Mostrar siempre</option>
@@ -170,6 +179,7 @@
   </div>
 
   <!-- Módulos compartidos de Mundos- (exponen window.Escenario, window.TexturasLib, etc.) -->
+  <script>window.MUNDOS_ASSETS = window.MUNDOS_ASSETS || 'https://narcimarquez-eng.github.io/Mundos-/';</script>
   <script src="vendor/mundos/js/escenario-core.js"></script>
   <script src="vendor/mundos/js/pradera-atlas.js"></script>
   <script src="vendor/mundos/js/texturas-lib.js"></script>
