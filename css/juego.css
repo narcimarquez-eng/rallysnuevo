@@ -55,12 +55,12 @@ html, body {
 
 .panel-menu {
   width: min(980px, 100%);
-  max-height: 94vh;
+  max-height: 95vh;
   overflow-y: auto;
   background: var(--fondo-panel);
   border: 1px solid var(--borde-panel);
   border-radius: 16px;
-  padding: 20px 22px;
+  padding: 15px 18px;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
 }
 
@@ -69,9 +69,9 @@ html, body {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
   border-bottom: 1px solid var(--borde-panel);
-  padding-bottom: 12px;
+  padding-bottom: 8px;
 }
 
 .menu-cabecera h1 {
@@ -105,10 +105,10 @@ html, body {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--borde-panel);
   border-radius: 12px;
-  padding: 14px;
+  padding: 11px 12px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 7px;
 }
 
 .bloque h2 {
@@ -173,8 +173,32 @@ select, input[type="url"] {
   filter: brightness(1.07);
 }
 
-.btn-primario:active, .btn-sec:active {
+.btn-primario:active, .btn-sec:active, .btn-aleatorio:active {
   transform: scale(0.97);
+}
+
+.btn-aleatorio {
+  width: 100%;
+  cursor: pointer;
+  border: 1px solid var(--borde-panel);
+  border-radius: 9px;
+  padding: 9px 14px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--texto);
+  transition: transform 0.1s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-aleatorio:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.btn-aleatorio.activo {
+  border-color: var(--acento);
+  background: rgba(255, 106, 26, 0.2);
+  color: #fff;
+  box-shadow: 0 0 0 1px var(--acento);
 }
 
 .rejilla-coches {
@@ -189,11 +213,11 @@ select, input[type="url"] {
   background: rgba(10, 14, 22, 0.65);
   border: 1px solid var(--borde-panel);
   border-radius: 10px;
-  padding: 9px 10px;
+  padding: 6px 9px;
   color: var(--texto);
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
 }
 
 .tarjeta-coche.activa {
@@ -244,8 +268,8 @@ select, input[type="url"] {
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
-  margin-top: 14px;
-  padding: 10px 14px;
+  margin-top: 10px;
+  padding: 8px 12px;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--borde-panel);
@@ -271,7 +295,7 @@ select, input[type="url"] {
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  margin-top: 16px;
+  margin-top: 10px;
 }
 
 .ayuda-teclas {

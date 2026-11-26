@@ -9,7 +9,13 @@ import {
   cargarEscenarioDesdeUrl,
   analizarCircuito
 } from './escenarios.js';
-import { COCHES_CATALOGO, crearCocheProcedural, cargarCocheGLB } from './coches.js';
+import {
+  COCHES_CATALOGO,
+  prepararMotorCoches,
+  crearCocheAleatorioRealista,
+  crearCocheDeGaraje,
+  cargarCocheGLB
+} from './coches.js';
 import { MundoFisica } from './mundo-fisica.js';
 import { SistemaColisiones } from './colisiones.js';
 import { FisicaCoche } from './fisica.js';
@@ -31,6 +37,7 @@ const dom = {
   btnUrlEscenario: document.getElementById('btn-url-escenario'),
   resumenEscenario: document.getElementById('resumen-escenario'),
   listaCoches: document.getElementById('lista-coches'),
+  btnCocheAleatorio: document.getElementById('btn-coche-aleatorio'),
   btnAbrirCoche: document.getElementById('btn-abrir-coche'),
   inpArchivoCoche: document.getElementById('inp-archivo-coche'),
   chkInvertirGlb: document.getElementById('chk-invertir-glb'),
@@ -120,7 +127,7 @@ let fisica = null;
 let carrera = null;
 let enCarrera = false;
 let carreraIniciada = false;
-let idCocheSeleccionado = COCHES_CATALOGO[0].id;
+let idCocheSeleccionado = 'aleatorio';
 let cocheGlbPersonalizado = null; // { archivo, nombre }
 
 const camaras = new GestorCamaras(camera, null);
@@ -232,13 +239,24 @@ function instalarCoche(coche) {
   actualizarInfoCoche();
 }
 
+function seleccionarCocheAleatorio() {
+  idCocheSeleccionado = 'aleatorio';
+  cocheGlbPersonalizado = null;
+  dom.btnCocheAleatorio?.classList.add('activo');
+  for (const btn of dom.listaCoches.querySelectorAll('.tarjeta-coche')) {
+    btn.classList.remove('activa');
+  }
+  instalarCoche(crearCocheAleatorioRealista());
+}
+
 function seleccionarCocheCatalogo(id) {
   idCocheSeleccionado = id;
   cocheGlbPersonalizado = null;
+  dom.btnCocheAleatorio?.classList.remove('activo');
   for (const btn of dom.listaCoches.querySelectorAll('.tarjeta-coche')) {
     btn.classList.toggle('activa', btn.dataset.id === id);
   }
-  instalarCoche(crearCocheProcedural(id));
+  instalarCoche(crearCocheDeGaraje(id));
 }
 
 async function seleccionarCocheGLB(origen, nombre) {
@@ -249,6 +267,7 @@ async function seleccionarCocheGLB(origen, nombre) {
       invertirZ: dom.chkInvertirGlb.checked
     });
     cocheGlbPersonalizado = { origen, nombre };
+    dom.btnCocheAleatorio?.classList.remove('activo');
     for (const btn of dom.listaCoches.querySelectorAll('.tarjeta-coche')) {
       btn.classList.remove('activa');
     }
@@ -265,9 +284,14 @@ function actualizarInfoCoche() {
   if (!cocheActual) return;
   const s = cocheActual.specs;
   const m = cocheActual.medidas;
-  const extra = cocheActual.esGLB
-    ? `<br>Modelo .glb importado · Ruedas detectadas: <b>${cocheActual.ruedasDetectadas}</b> · ${m.largo.toFixed(2)}×${m.ancho.toFixed(2)} m`
-    : `<br>${COCHES_CATALOGO.find(c => c.id === cocheActual.id)?.descripcion || ''}`;
+  let extra = '';
+  if (cocheActual.esGLB) {
+    extra = `<br>Modelo .glb importado · Ruedas detectadas: <b>${cocheActual.ruedasDetectadas}</b> · ${m.largo.toFixed(2)}×${m.ancho.toFixed(2)} m`;
+  } else if (cocheActual.esAleatorio) {
+    extra = `<br>Generado con <b>Aleatorio realista</b> (Hacer-coches-) · Pintura <b>${cocheActual.tipoPintura}</b> <span class="punto-color" style="background:${cocheActual.colorPintura};vertical-align:middle"></span> · ${m.largo.toFixed(2)}×${m.ancho.toFixed(2)} m`;
+  } else {
+    extra = `<br>${COCHES_CATALOGO.find(c => c.id === cocheActual.id)?.descripcion || ''}`;
+  }
   dom.infoCoche.innerHTML =
     `<b>${cocheActual.nombre}</b> · ${s.potencia} CV · ${s.masa} kg · Vel. máx ${s.velMaxKmh} km/h${extra}`;
 }
@@ -322,7 +346,7 @@ function inicializarUI() {
   for (const c of COCHES_CATALOGO) {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'tarjeta-coche' + (c.id === idCocheSeleccionado ? ' activa' : '');
+    btn.className = 'tarjeta-coche';
     btn.dataset.id = c.id;
     btn.innerHTML =
       `<span class="coche-nombre"><span class="punto-color" style="background:${c.color}"></span>${c.nombre}</span>` +
@@ -330,6 +354,8 @@ function inicializarUI() {
     btn.addEventListener('click', () => seleccionarCocheCatalogo(c.id));
     dom.listaCoches.appendChild(btn);
   }
+
+  dom.btnCocheAleatorio?.addEventListener('click', () => seleccionarCocheAleatorio());
 
   dom.selEscenario.addEventListener('change', () => {
     aplicarEscenario(obtenerEscenarioPredefinido(dom.selEscenario.value));
@@ -659,13 +685,23 @@ window.__RALLY__ = {
     await seleccionarCocheGLB(bytes.buffer, nombre);
     return this.estado();
   },
+  generarAleatorioRealista() {
+    seleccionarCocheAleatorio();
+    return this.estado();
+  },
   cargarCoche: null
 };
 
 // --- Arranque ---
 async function iniciar() {
   inicializarUI();
-  seleccionarCocheCatalogo(idCocheSeleccionado);
+  dom.estadoCarga.textContent = 'Cargando piezas de Hacer-coches-…';
+  try {
+    await prepararMotorCoches();
+  } catch (e) {
+    console.warn('No se pudieron cargar las piezas Blender de Hacer-coches-:', e);
+  }
+  seleccionarCocheAleatorio();
 
   const params = new URLSearchParams(window.location.search);
   const urlEsc = params.get('escenario');

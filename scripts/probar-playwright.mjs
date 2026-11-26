@@ -54,8 +54,14 @@ async function main() {
     });
 
     await page.goto(url, { waitUntil: 'domcontentloaded' });
-    await page.waitForFunction(() => Boolean(window.__RALLY__ && window.__RALLY__.estado().escenario), null, { timeout: 25000 });
+    await page.waitForFunction(() => Boolean(window.__RALLY__ && window.__RALLY__.estado().escenario && window.__RALLY__.estado().coche), null, { timeout: 25000 });
     await page.waitForTimeout(2800);
+
+    const estIni = await page.evaluate(() => window.__RALLY__.estado());
+    console.log('  Coche inicial:', estIni.coche, '| ruedas:', estIni.ruedasDetectadas);
+    if (!String(estIni.coche).startsWith('aleatorio-') || estIni.ruedasDetectadas !== 4) {
+      throw new Error('El coche inicial no usó Aleatorio realista con 4 ruedas');
+    }
 
     // 1. Menú sobre el mundo 3D
     await page.screenshot({ path: path.join(DIR_CAPTURAS, '01-menu-escenario.png') });
@@ -159,9 +165,12 @@ async function main() {
     await page.keyboard.up('KeyW');
     console.log('✓ 07-camara-cabina.png');
 
-    // Cambiar de coche del garaje (Baja 4x4) para verificar también el segundo modelo real de Hacer-coches-
+    // Pulsar "Aleatorio realista" en el menú para generar un segundo coche distinto, y también probar un preset (tucson)
     await page.click('#btn-menu');
-    await page.click('.tarjeta-coche[data-id="offroad"]');
+    await page.click('#btn-coche-aleatorio');
+    const estAleat2 = await page.evaluate(() => window.__RALLY__.estado());
+    console.log('✓ Nuevo Aleatorio realista generado:', estAleat2.coche);
+    await page.click('.tarjeta-coche[data-id="tucson"]');
     await page.click('#btn-correr');
     await page.evaluate(() => {
       window.__RALLY__.empezarSinCuenta();
@@ -170,7 +179,7 @@ async function main() {
     await page.keyboard.down('KeyW');
     await page.waitForFunction(() => window.__RALLY__.estado().fisica.velocidadKmh > 20, null, { timeout: 10000 });
     await page.keyboard.up('KeyW');
-    console.log('✓ Segundo coche de Hacer-coches- (offroad) probado');
+    console.log('✓ Segundo modelo de Hacer-coches- (tucson) probado');
 
     // 9. Probar importación real de .glb estilo Hacer-coches-
     const resGlb = await page.evaluate(async () => {
@@ -243,7 +252,7 @@ async function main() {
     const pageM = await ctxMovil.newPage();
     pageM.on('pageerror', err => erroresPagina.push('[Movil] ' + err.message));
     await pageM.goto(url, { waitUntil: 'domcontentloaded' });
-    await pageM.waitForFunction(() => Boolean(window.__RALLY__ && window.__RALLY__.estado().escenario), null, { timeout: 25000 });
+    await pageM.waitForFunction(() => Boolean(window.__RALLY__ && window.__RALLY__.estado().escenario && window.__RALLY__.estado().coche), null, { timeout: 25000 });
     await pageM.evaluate(() => window.__RALLY__.empezarSinCuenta());
     await pageM.waitForTimeout(300);
     const tactilOculto = await pageM.getAttribute('#controles-tactiles', 'hidden');

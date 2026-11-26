@@ -1,105 +1,103 @@
-// Catálogo con los 5 coches reales del garaje de narcimarquez-eng/Hacer-coches-
-// más el importador de archivos .glb exportados desde Parametric Car 3D Studio.
-// Convención de ejes compartida con Hacer-coches- y Mundos-:
-//   +Z = frente del coche, +Y = arriba, Y = 0 = apoyo inferior de neumáticos, -X = lado volante.
+// Generación y carga de coches desde narcimarquez-eng/Hacer-coches- (ccr-b02f9bfd-g5ar6l):
+//   - Generador principal: "Aleatorio realista" (randomize + isPlausibleCar + car_parts.q.glb)
+//   - Los 6 modelos prediseñados de FIVE_CARS (Fastback, Crossover, Retro, GT4, MPV, Tucson)
+//   - Cargador externo de archivos .glb exportados desde Parametric Car 3D Studio.
+// Ejes: +Z = frente, +Y = arriba, Y = 0 = apoyo inferior de neumáticos, -X = lado volante.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
-import { construirCocheHacerCoches } from '../vendor/hacer-coches/motor-coches.js';
+import {
+  cargarPiezasHacerCoches,
+  FIVE_CARS,
+  construirCocheAleatorioRealista,
+  construirCocheHacerCoches
+} from '../vendor/hacer-coches/motor-coches.js';
 
 export const COCHES_CATALOGO = [
   {
-    id: 'urban',
-    nombre: 'Urban Speedster',
-    etiqueta: 'Compacto · 4x4 Ágil',
-    descripcion: 'Voladizos mínimos y chasis corto de Hacer-coches-: ideal para horquillas de rally.',
-    color: '#e8a800',
-    specs: {
-      masa: 1180,
-      potencia: 325,
-      traccion: '4x4',
-      repartoTrasero: 0.56,
-      velMaxKmh: 188,
-      agarreBase: 1.05,
-      recorridoSusp: 0.24,
-      alturaLibre: 0.20,
-      frenada: 1.06
-    }
+    id: 'gt4',
+    nombre: 'GT4 Retro',
+    etiqueta: 'Cupé · Rápido',
+    descripcion: FIVE_CARS.gt4.desc,
+    color: '#991b1b',
+    specs: specsPorModelo('coupe')
   },
   {
-    id: 'offroad',
-    nombre: 'Baja 4x4',
-    etiqueta: 'SUV · Tacos y Vados',
-    descripcion: 'Parachoques a cero, ruedas grandes y neumáticos de tacos para grava y agua.',
-    color: '#3c4737',
-    specs: {
-      masa: 1580,
-      potencia: 345,
-      traccion: '4x4',
-      repartoTrasero: 0.52,
-      velMaxKmh: 174,
-      agarreBase: 1.02,
-      recorridoSusp: 0.34,
-      alturaLibre: 0.32,
-      frenada: 0.96
-    }
+    id: 'tucson',
+    nombre: 'SUV Urbano',
+    etiqueta: 'SUV · Vados y Grava',
+    descripcion: FIVE_CARS.tucson.desc,
+    color: '#0f766e',
+    specs: specsPorModelo('suv')
   },
   {
-    id: 'supercar',
-    nombre: 'Cyber Wedge',
-    etiqueta: 'Cupé · Derrape Rápido',
-    descripcion: 'Morro en cuña deportiva, mucha potencia y trasera nerviosa para cruzarlo.',
-    color: '#d81420',
-    specs: {
-      masa: 1210,
-      potencia: 390,
-      traccion: '4x4',
-      repartoTrasero: 0.72,
-      velMaxKmh: 205,
-      agarreBase: 0.99,
-      recorridoSusp: 0.20,
-      alturaLibre: 0.18,
-      frenada: 1.08
-    }
+    id: 'crossover',
+    nombre: 'Crossover Boxy',
+    etiqueta: 'SUV · Robusto',
+    descripcion: FIVE_CARS.crossover.desc,
+    color: '#6b7280',
+    specs: specsPorModelo('suv')
   },
   {
-    id: 'gt',
-    nombre: 'Gran Turismo Royale',
-    etiqueta: 'Cupé · Pista Rápida',
-    descripcion: 'Comba clásica de Hacer-coches- con gran aplomo en asfalto y pistas rápidas.',
-    color: '#091c3d',
-    specs: {
-      masa: 1310,
-      potencia: 350,
-      traccion: '4x4',
-      repartoTrasero: 0.60,
-      velMaxKmh: 196,
-      agarreBase: 1.06,
-      recorridoSusp: 0.21,
-      alturaLibre: 0.18,
-      frenada: 1.05
-    }
+    id: 'fastback',
+    nombre: 'Fastback Eléctrico',
+    etiqueta: 'Sedán · Equilibrado',
+    descripcion: FIVE_CARS.fastback.desc,
+    color: '#e5e7eb',
+    specs: specsPorModelo('sedan')
   },
   {
-    id: 'phantom',
-    nombre: 'Phantom V8',
-    etiqueta: 'Sedán V8 · Potencia',
-    descripcion: 'Capó largo y batalla amplia: empuje V8 muy estable a alta velocidad.',
-    color: '#111215',
-    specs: {
-      masa: 1520,
-      potencia: 410,
-      traccion: '4x4',
-      repartoTrasero: 0.58,
-      velMaxKmh: 194,
-      agarreBase: 1.03,
-      recorridoSusp: 0.22,
-      alturaLibre: 0.22,
-      frenada: 1.02
-    }
+    id: 'retro',
+    nombre: 'Sedán Clásico 70s',
+    etiqueta: 'Clásico · Derrapón',
+    descripcion: FIVE_CARS.retro.desc,
+    color: '#7c2d12',
+    specs: specsPorModelo('sedan')
+  },
+  {
+    id: 'mpv',
+    nombre: 'Monovolumen',
+    etiqueta: 'MPV · Estable',
+    descripcion: FIVE_CARS.mpv.desc,
+    color: '#1e3a8a',
+    specs: specsPorModelo('limo')
   }
 ];
+
+function specsPorModelo(modelo) {
+  switch (modelo) {
+    case 'compact':
+      return {
+        masa: 1180, potencia: 325, traccion: '4x4', repartoTrasero: 0.56,
+        velMaxKmh: 188, agarreBase: 1.05, recorridoSusp: 0.24, alturaLibre: 0.20, frenada: 1.06
+      };
+    case 'coupe':
+      return {
+        masa: 1240, potencia: 375, traccion: '4x4', repartoTrasero: 0.68,
+        velMaxKmh: 202, agarreBase: 1.02, recorridoSusp: 0.21, alturaLibre: 0.18, frenada: 1.07
+      };
+    case 'suv':
+      return {
+        masa: 1560, potencia: 345, traccion: '4x4', repartoTrasero: 0.52,
+        velMaxKmh: 178, agarreBase: 1.03, recorridoSusp: 0.34, alturaLibre: 0.30, frenada: 0.98
+      };
+    case 'limo':
+      return {
+        masa: 1620, potencia: 360, traccion: '4x4', repartoTrasero: 0.55,
+        velMaxKmh: 185, agarreBase: 1.01, recorridoSusp: 0.23, alturaLibre: 0.21, frenada: 1.00
+      };
+    default: // sedan
+      return {
+        masa: 1360, potencia: 345, traccion: '4x4', repartoTrasero: 0.58,
+        velMaxKmh: 194, agarreBase: 1.04, recorridoSusp: 0.23, alturaLibre: 0.20, frenada: 1.04
+      };
+  }
+}
+
+export async function prepararMotorCoches() {
+  return await cargarPiezasHacerCoches('vendor/hacer-coches/car_parts.q.glb');
+}
 
 let loaderCompartido = null;
 function obtenerLoader() {
@@ -113,10 +111,16 @@ function obtenerLoader() {
   return loader;
 }
 
-/** Envuelve un nodo Wheel en pivotes de dirección, suspensión y giro manteniendo su escala/rotación local. */
+/**
+ * Envuelve cada rueda en pivotes de dirección, suspensión y rodadura.
+ * Si la rueda tiene hijos WheelSpin_* y BrakeCaliper_* (Hacer-coches- ccr),
+ * solo rueda WheelSpin_* y la pinza de freno queda fija.
+ */
 function envolverNodoRueda(nodoWheel, raizEscena) {
   raizEscena.updateMatrixWorld(true);
-  const caja = new THREE.Box3().setFromObject(nodoWheel);
+  const spinChild = nodoWheel.children.find(c => /^WheelSpin_/i.test(c.name)) || null;
+  const cajaTarget = spinChild || nodoWheel;
+  const caja = new THREE.Box3().setFromObject(cajaTarget);
   const centroMundo = new THREE.Vector3();
   const tam = new THREE.Vector3();
   caja.getCenter(centroMundo);
@@ -137,12 +141,21 @@ function envolverNodoRueda(nodoWheel, raizEscena) {
   susp.add(giro);
 
   padre.add(pivoteBase);
-  giro.attach(nodoWheel);
+
+  if (spinChild) {
+    // Mover spinChild al grupo giratorio y el resto (BrakeCaliper_*) a susp para que no gire con la rueda
+    const otros = nodoWheel.children.filter(c => c !== spinChild);
+    giro.attach(spinChild);
+    for (const o of otros) susp.attach(o);
+    padre.remove(nodoWheel);
+  } else {
+    giro.attach(nodoWheel);
+  }
 
   return { base: pivoteBase, dir, susp, giro, centroMundo, radio };
 }
 
-/** Prepara las 4 ruedas de cualquier coche (garaje Hacer-coches- o .glb importado) para física y animación. */
+/** Prepara las 4 ruedas de cualquier coche (garaje/aleatorio Hacer-coches- o .glb importado) para física y animación. */
 function prepararRuedasYCaja(escenaModelo, raiz, chasis) {
   escenaModelo.updateMatrixWorld(true);
   const caja = new THREE.Box3().setFromObject(escenaModelo);
@@ -203,11 +216,16 @@ function prepararRuedasYCaja(escenaModelo, raiz, chasis) {
     if (interior) {
       let aro = null;
       interior.traverse(o => {
-        if (!aro && o.isMesh && o.geometry && o.geometry.type === 'TorusGeometry') {
-          const p = o.geometry.parameters;
-          if (p && p.radius > 0.12 && p.radius < 0.22) aro = o;
-        }
+        if (!aro && /steering/i.test(o.name)) aro = o;
       });
+      if (!aro) {
+        interior.traverse(o => {
+          if (!aro && o.isMesh && o.geometry && o.geometry.type === 'TorusGeometry') {
+            const p = o.geometry.parameters;
+            if (p && p.radius > 0.12 && p.radius < 0.22) aro = o;
+          }
+        });
+      }
       if (aro) {
         const piv = new THREE.Group();
         piv.name = 'SteeringWheelPivot';
@@ -224,13 +242,11 @@ function prepararRuedasYCaja(escenaModelo, raiz, chasis) {
   return { tam, ruedas, ruedasDetectadas: ruedasEnv.length, radioMedio, batalla, via, volante };
 }
 
-/** Construye uno de los 5 coches del garaje real de Hacer-coches-. */
-export function crearCocheDeGaraje(defId = 'urban') {
-  const def = COCHES_CATALOGO.find(c => c.id === defId) || COCHES_CATALOGO[0];
-  const { grupo: modelo, P, taillightMat } = construirCocheHacerCoches(def.id);
+function envolverResultadoMotor(id, nombre, resMotor, esAleatorio = false) {
+  const { grupo: modelo, P, taillightMat, modelo: tipoModelo, etiquetaModelo, colorPintura, tipoPintura } = resMotor;
 
   const raiz = new THREE.Group();
-  raiz.name = `RallyHacerCoches_${def.id}`;
+  raiz.name = `RallyHacerCoches_${id}`;
   const chasis = new THREE.Group();
   chasis.name = 'Chassis';
   raiz.add(chasis);
@@ -238,7 +254,6 @@ export function crearCocheDeGaraje(defId = 'urban') {
 
   const info = prepararRuedasYCaja(modelo, raiz, chasis);
 
-  // Posiciones exactas para capó y cabina según la geometría real de Hacer-coches-
   const offsetZ = modelo.position.z;
   const offsetY = modelo.position.y;
   const spanCabina = Math.max(0.5, P.cabinFrontZ - P.cabinRearZ);
@@ -253,13 +268,18 @@ export function crearCocheDeGaraje(defId = 'urban') {
     batalla: info.batalla,
     via: info.via,
     radioRueda: info.radioMedio,
-    capoPos: new THREE.Vector3(0, P.beltY + offsetY + 0.16, P.cabinFrontZ + offsetZ + 0.08),
+    capoPos: new THREE.Vector3(0, P.beltY + offsetY + 0.24, P.cabinFrontZ + offsetZ + 0.24),
     cabinaPos: new THREE.Vector3(asientoX, eyeCabinaY, eyeCabinaZ)
   };
 
   return crearControladorVisual({
-    id: def.id,
-    nombre: def.nombre,
+    id,
+    nombre,
+    modeloBase: tipoModelo,
+    etiquetaModelo,
+    colorPintura,
+    tipoPintura,
+    esAleatorio,
     raiz,
     chasis,
     ruedas: info.ruedas,
@@ -268,12 +288,26 @@ export function crearCocheDeGaraje(defId = 'urban') {
     intensidadFrenoBase: taillightMat ? taillightMat.emissiveIntensity : 3.5,
     medidas,
     ruedasDetectadas: info.ruedasDetectadas,
-    specs: def.specs
+    specs: specsPorModelo(tipoModelo)
   });
 }
 
-// Alias para mantener compatibilidad con llamadas existentes
-export const crearCocheProcedural = crearCocheDeGaraje;
+/** Genera un coche nuevo con el modo "Aleatorio realista" de Hacer-coches-. */
+export function crearCocheAleatorioRealista() {
+  const res = construirCocheAleatorioRealista();
+  const id = 'aleatorio-' + Date.now().toString(36).slice(-5);
+  const nombre = `${res.etiquetaModelo} (Aleatorio realista)`;
+  return envolverResultadoMotor(id, nombre, res, true);
+}
+
+/** Construye uno de los 6 modelos prediseñados de FIVE_CARS en Hacer-coches-. */
+export function crearCocheDeGaraje(defId = 'gt4') {
+  const def = COCHES_CATALOGO.find(c => c.id === defId) || COCHES_CATALOGO[0];
+  const res = construirCocheHacerCoches(def.id);
+  return envolverResultadoMotor(def.id, def.nombre, res, false);
+}
+
+export const crearCocheProcedural = crearCocheAleatorioRealista;
 
 /**
  * Carga un archivo .glb exportado por Hacer-coches- (File, ArrayBuffer o URL),
@@ -300,7 +334,6 @@ export async function cargarCocheGLB(origen, opciones = {}) {
   const escenaModelo = gltf.scene;
   if (opciones.invertirZ) escenaModelo.rotation.y = Math.PI;
 
-  // Limpiar posibles wireframes de selección exportados desde Hacer-coches-
   const aQuitar = [];
   escenaModelo.traverse(o => {
     if (o.isMesh && o.material && o.material.wireframe && o.material.isMeshBasicMaterial) {
@@ -354,17 +387,7 @@ export async function cargarCocheGLB(origen, opciones = {}) {
     medidas,
     esGLB: true,
     ruedasDetectadas: info.ruedasDetectadas,
-    specs: {
-      masa: 1320,
-      potencia: 340,
-      traccion: '4x4',
-      repartoTrasero: 0.58,
-      velMaxKmh: 192,
-      agarreBase: 1.03,
-      recorridoSusp: 0.24,
-      alturaLibre: 0.20,
-      frenada: 1.04
-    }
+    specs: specsPorModelo('coupe')
   });
 }
 
@@ -381,12 +404,10 @@ function crearControladorVisual(cfg) {
       cfg.raiz.rotateX(estado.pitchTerreno);
       cfg.raiz.rotateZ(estado.rollTerreno);
 
-      // Cabeceo y balanceo dinámico del chasis sobre su suspensión
       cfg.chasis.position.y = estado.reboteChasis;
       cfg.chasis.rotation.x = estado.pitchDinamico;
       cfg.chasis.rotation.z = estado.rollDinamico;
 
-      // Rodadura de las 4 ruedas
       const radio = cfg.medidas.radioRueda || 0.35;
       anguloRodadura = (anguloRodadura + (estado.vLong * dt) / radio) % (Math.PI * 200);
 
@@ -404,7 +425,6 @@ function crearControladorVisual(cfg) {
       }
 
       if (cfg.volante) {
-        // El volante de Hacer-coches- tiene su aro orientado en XY local con rotación en X; giramos alrededor de Z local
         cfg.volante.rotation.z = -estado.anguloDireccion * 2.6;
       }
       if (cfg.matFreno) {
