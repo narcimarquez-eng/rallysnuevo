@@ -1,0 +1,633 @@
+:root {
+  --fondo-panel: rgba(14, 19, 28, 0.86);
+  --borde-panel: rgba(255, 255, 255, 0.14);
+  --acento: #ff6a1a;
+  --acento-2: #ffd21f;
+  --texto: #f3f6fb;
+  --texto-suave: #a8b5c7;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #0d131d;
+  color: var(--texto);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#lienzo {
+  position: fixed;
+  inset: 0;
+}
+
+#lienzo canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Menú principal */
+.overlay-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: radial-gradient(circle at center, rgba(10, 14, 22, 0.45), rgba(8, 12, 18, 0.82));
+  backdrop-filter: blur(6px);
+  overflow-y: auto;
+}
+
+.overlay-menu[hidden] {
+  display: none;
+}
+
+.panel-menu {
+  width: min(980px, 100%);
+  max-height: 94vh;
+  overflow-y: auto;
+  background: var(--fondo-panel);
+  border: 1px solid var(--borde-panel);
+  border-radius: 16px;
+  padding: 20px 22px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+}
+
+.menu-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--borde-panel);
+  padding-bottom: 12px;
+}
+
+.menu-cabecera h1 {
+  font-size: 1.55rem;
+  letter-spacing: -0.02em;
+}
+
+.subtitulo {
+  color: var(--texto-suave);
+  font-size: 0.9rem;
+  margin-top: 2px;
+}
+
+.insignia-estado {
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--borde-panel);
+  font-size: 0.82rem;
+  color: var(--acento-2);
+  white-space: nowrap;
+}
+
+.menu-rejilla {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.bloque {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--borde-panel);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bloque h2 {
+  font-size: 1.05rem;
+  color: #fff;
+}
+
+.campo-etiqueta {
+  font-size: 0.8rem;
+  color: var(--texto-suave);
+}
+
+select, input[type="url"] {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--borde-panel);
+  background: rgba(8, 12, 19, 0.88);
+  color: var(--texto);
+  font-size: 0.9rem;
+}
+
+.fila-botones, .fila-url {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.fila-url input {
+  flex: 1;
+}
+
+.btn-primario, .btn-sec {
+  cursor: pointer;
+  border: 1px solid var(--borde-panel);
+  border-radius: 9px;
+  padding: 9px 14px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: transform 0.1s ease, background 0.15s ease;
+}
+
+.btn-sec {
+  background: rgba(255, 255, 255, 0.09);
+  color: var(--texto);
+}
+
+.btn-sec:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.btn-primario {
+  background: linear-gradient(135deg, var(--acento), #ff8c24);
+  color: #111;
+  border-color: transparent;
+  font-size: 1rem;
+  padding: 11px 22px;
+  font-weight: 800;
+}
+
+.btn-primario:hover {
+  filter: brightness(1.07);
+}
+
+.btn-primario:active, .btn-sec:active {
+  transform: scale(0.97);
+}
+
+.rejilla-coches {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.tarjeta-coche {
+  text-align: left;
+  cursor: pointer;
+  background: rgba(10, 14, 22, 0.65);
+  border: 1px solid var(--borde-panel);
+  border-radius: 10px;
+  padding: 9px 10px;
+  color: var(--texto);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.tarjeta-coche.activa {
+  border-color: var(--acento);
+  background: rgba(255, 106, 26, 0.16);
+  box-shadow: 0 0 0 1px var(--acento);
+}
+
+.tarjeta-coche .coche-nombre {
+  font-weight: 700;
+  font-size: 0.88rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.punto-color {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.tarjeta-coche .coche-etiq {
+  font-size: 0.75rem;
+  color: var(--acento-2);
+}
+
+.check-linea {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.83rem;
+  color: var(--texto-suave);
+}
+
+.caja-info {
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--texto-suave);
+  background: rgba(0, 0, 0, 0.28);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.barra-ajustes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 14px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--borde-panel);
+  align-items: center;
+}
+
+.ajuste {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+}
+
+.ajuste select {
+  width: auto;
+  padding: 5px 8px;
+}
+
+.menu-pie {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.ayuda-teclas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 0.8rem;
+  color: var(--texto-suave);
+}
+
+.ayuda-teclas b {
+  color: var(--texto);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 5px;
+}
+
+.acciones-finales {
+  display: flex;
+  gap: 10px;
+}
+
+/* HUD en carrera */
+#hud {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+
+#hud[hidden] {
+  display: none;
+}
+
+.hud-sup-izq {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+}
+
+.tarjeta-tiempo {
+  background: var(--fondo-panel);
+  border: 1px solid var(--borde-panel);
+  border-radius: 12px;
+  padding: 10px 14px;
+  min-width: 210px;
+  backdrop-filter: blur(5px);
+}
+
+.fila-crono {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.etiq {
+  font-size: 0.72rem;
+  color: var(--texto-suave);
+  letter-spacing: 0.06em;
+}
+
+.crono {
+  font-size: 1.5rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+}
+
+.fila-datos-crono {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 4px;
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.parcial {
+  margin-top: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.parcial.mejor { color: #4ade80; }
+.parcial.peor { color: #fb923c; }
+
+.hud-sup-der {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+#minimapa {
+  border-radius: 12px;
+  border: 1px solid var(--borde-panel);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.botones-hud {
+  display: flex;
+  gap: 6px;
+  pointer-events: auto;
+}
+
+.botones-hud button {
+  cursor: pointer;
+  background: var(--fondo-panel);
+  color: var(--texto);
+  border: 1px solid var(--borde-panel);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.botones-hud button:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.semaforo {
+  position: absolute;
+  top: 26%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 4.5rem;
+  font-weight: 900;
+  color: var(--acento-2);
+  text-shadow: 0 6px 28px rgba(0, 0, 0, 0.85);
+}
+
+.aviso-central {
+  position: absolute;
+  top: 16%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--fondo-panel);
+  border: 1px solid var(--acento);
+  color: #fff;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 1rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.hud-inf-der {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+}
+
+body.con-tactil .hud-inf-der {
+  bottom: 112px;
+  right: 12px;
+}
+
+body.con-tactil .tarjeta-telemetria {
+  min-width: 146px;
+  padding: 7px 11px;
+}
+
+@media (max-height: 520px) and (min-width: 600px) {
+  body.con-tactil .hud-inf-der {
+    top: 12px;
+    bottom: auto;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-height: 480px) {
+  #minimapa { width: 96px; height: 96px; }
+  .tarjeta-tiempo { padding: 7px 10px; min-width: 185px; }
+  .crono { font-size: 1.25rem; }
+  .velocidad { font-size: 1.45rem; }
+}
+
+.tarjeta-telemetria {
+  background: var(--fondo-panel);
+  border: 1px solid var(--borde-panel);
+  border-radius: 14px;
+  padding: 10px 14px;
+  min-width: 175px;
+  backdrop-filter: blur(5px);
+}
+
+.sup-badge {
+  display: inline-block;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.11);
+  color: var(--acento-2);
+  margin-bottom: 4px;
+}
+
+.fila-vel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.marcha {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--acento);
+  color: #111;
+  font-weight: 900;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vel-bloque {
+  text-align: right;
+}
+
+.velocidad {
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.unidad {
+  font-size: 0.75rem;
+  color: var(--texto-suave);
+  margin-left: 3px;
+}
+
+.barra-rpm {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.barra-rpm-relleno {
+  height: 100%;
+  width: 15%;
+  background: linear-gradient(90deg, #22c55e, #eab308, #ef4444);
+  transition: width 0.05s linear;
+}
+
+.estado-extra {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+  min-height: 18px;
+}
+
+.chip-derrape, .chip-mando {
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 5px;
+}
+
+.chip-derrape {
+  background: rgba(255, 106, 26, 0.25);
+  color: #ffb17a;
+}
+
+.chip-mando {
+  background: rgba(56, 189, 248, 0.2);
+  color: #7dd3fc;
+}
+
+/* Controles táctiles */
+.controles-tactiles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  touch-action: none;
+}
+
+.controles-tactiles[hidden] {
+  display: none;
+}
+
+.grupo-tactil-izq, .grupo-tactil-der {
+  position: absolute;
+  bottom: 18px;
+  display: flex;
+  gap: 10px;
+  pointer-events: auto;
+}
+
+.grupo-tactil-izq { left: 16px; }
+.grupo-tactil-der { right: 16px; }
+
+.btn-tactil {
+  touch-action: none;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: rgba(14, 19, 28, 0.62);
+  color: #fff;
+  font-weight: 800;
+  border-radius: 16px;
+  backdrop-filter: blur(4px);
+}
+
+.btn-tactil.activo {
+  background: rgba(255, 106, 26, 0.72);
+  border-color: #fff;
+  transform: scale(0.95);
+}
+
+.btn-dir {
+  width: 68px;
+  height: 68px;
+  font-size: 1.5rem;
+}
+
+.btn-gas {
+  width: 78px;
+  height: 84px;
+  font-size: 0.95rem;
+  border-color: rgba(74, 222, 128, 0.6);
+}
+
+.btn-freno {
+  width: 66px;
+  height: 68px;
+  align-self: flex-end;
+  font-size: 0.78rem;
+  border-color: rgba(248, 113, 113, 0.6);
+}
+
+.btn-mano {
+  width: 62px;
+  height: 58px;
+  align-self: flex-end;
+  font-size: 0.75rem;
+  border-color: rgba(250, 204, 21, 0.6);
+}
+
+@media (max-width: 760px) {
+  .menu-rejilla { grid-template-columns: 1fr; }
+  .panel-menu { padding: 14px; }
+  #minimapa { width: 112px; height: 112px; }
+  .hud-inf-der { bottom: 116px; right: 12px; }
+  .tarjeta-telemetria { min-width: 146px; padding: 8px 10px; }
+  .velocidad { font-size: 1.55rem; }
+  .botones-hud button span { display: none; }
+}

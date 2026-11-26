@@ -1,0 +1,15 @@
+{
+  "name": "rallys-divertidos",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Juego 3D de rallys sin compilación con escenarios de Mundos- y coches de Hacer-coches-",
+  "scripts": {
+    "actualizar-mundos": "node scripts/actualizar-mundos.mjs",
+    "servir": "node scripts/servidor.mjs",
+    "probar": "node scripts/probar-playwright.mjs"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.65.1"
+  }
+}

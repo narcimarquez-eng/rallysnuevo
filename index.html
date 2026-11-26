@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Rallys divertidos</title>
+  <link rel="icon" href="data:,">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"
+    }
+  }
+  </script>
+  <link rel="stylesheet" href="css/juego.css">
+</head>
+<body>
+  <div id="lienzo"></div>
+
+  <!-- Menú principal / Pausa -->
+  <div id="pantalla-menu" class="overlay-menu">
+    <div class="panel-menu">
+      <header class="menu-cabecera">
+        <div>
+          <h1>🏁 Rallys divertidos</h1>
+          <p class="subtitulo">Escenarios de <strong>Mundos-</strong> y coches de <strong>Hacer-coches-</strong></p>
+        </div>
+        <div class="insignia-estado" id="estado-carga">Listo</div>
+      </header>
+
+      <div class="menu-rejilla">
+        <!-- Escenario -->
+        <section class="bloque">
+          <h2>🗺️ Escenario</h2>
+          <label class="campo-etiqueta" for="sel-escenario">Circuitos incluidos</label>
+          <select id="sel-escenario"></select>
+
+          <div class="fila-botones">
+            <button type="button" id="btn-abrir-escenario" class="btn-sec">📂 Abrir .escenario.json</button>
+            <input type="file" id="inp-archivo-escenario" accept=".json,.escenario.json,application/json" hidden>
+          </div>
+
+          <div class="fila-url">
+            <input type="url" id="inp-url-escenario" placeholder="URL de .escenario.json (https://...)">
+            <button type="button" id="btn-url-escenario" class="btn-sec">🌐 Cargar</button>
+          </div>
+
+          <div id="resumen-escenario" class="caja-info">Cargando circuito...</div>
+        </section>
+
+        <!-- Coche -->
+        <section class="bloque">
+          <h2>🚗 Coche</h2>
+          <div id="lista-coches" class="rejilla-coches"></div>
+
+          <div class="fila-botones">
+            <button type="button" id="btn-abrir-coche" class="btn-sec">📦 Cargar coche .glb (Hacer-coches-)</button>
+            <input type="file" id="inp-archivo-coche" accept=".glb,.gltf" hidden>
+          </div>
+          <label class="check-linea">
+            <input type="checkbox" id="chk-invertir-glb">
+            <span>Girar coche .glb 180° (si apunta al revés)</span>
+          </label>
+          <div id="info-coche" class="caja-info"></div>
+        </section>
+      </div>
+
+      <!-- Ajustes -->
+      <section class="barra-ajustes">
+        <label class="ajuste">
+          <span>Calidad gráfica</span>
+          <select id="sel-calidad">
+            <option value="baja">Baja</option>
+            <option value="media" selected>Media</option>
+            <option value="alta">Alta</option>
+          </select>
+        </label>
+        <label class="ajuste">
+          <span>Sonido</span>
+          <input type="checkbox" id="chk-sonido" checked>
+        </label>
+        <label class="ajuste">
+          <span>Controles táctiles</span>
+          <select id="sel-tactil">
+            <option value="auto" selected>Automático</option>
+            <option value="si">Mostrar siempre</option>
+            <option value="no">Ocultar</option>
+          </select>
+        </label>
+      </section>
+
+      <footer class="menu-pie">
+        <div class="ayuda-teclas">
+          <span><b>WASD / Flechas</b> Conducir</span>
+          <span><b>Espacio</b> Freno de mano</span>
+          <span><b>C</b> Cámara</span>
+          <span><b>R</b> Recolocar</span>
+          <span><b>Esc</b> Menú</span>
+        </div>
+        <div class="acciones-finales">
+          <button type="button" id="btn-reanudar" class="btn-sec" hidden>▶ Seguir corriendo</button>
+          <button type="button" id="btn-correr" class="btn-primario">🏁 ¡A correr!</button>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- HUD en carrera -->
+  <div id="hud" hidden>
+    <div class="hud-sup-izq">
+      <div class="tarjeta-tiempo">
+        <div class="fila-crono">
+          <span class="etiq">VUELTA <b id="hud-vuelta">1</b></span>
+          <span class="crono" id="hud-crono">00:00.00</span>
+        </div>
+        <div class="fila-datos-crono">
+          <div><span class="etiq">MEJOR</span> <b id="hud-mejor">--:--.--</b></div>
+          <div><span class="etiq">CONTROL</span> <b id="hud-control">0/0</b></div>
+        </div>
+        <div id="hud-parcial" class="parcial" hidden></div>
+      </div>
+    </div>
+
+    <div class="hud-sup-der">
+      <canvas id="minimapa" width="168" height="168" title="Mapa del circuito"></canvas>
+      <div class="botones-hud">
+        <button type="button" id="btn-camara" title="Cambiar cámara (C)">🎥 <span id="lbl-camara">Persecución</span></button>
+        <button type="button" id="btn-recolocar" title="Recolocar en pista (R)">↺ <span>Pista</span></button>
+        <button type="button" id="btn-menu" title="Menú y ajustes (Esc)">☰ <span>Menú</span></button>
+      </div>
+    </div>
+
+    <div id="semaforo" class="semaforo" hidden>3</div>
+    <div id="aviso-central" class="aviso-central" hidden></div>
+
+    <div class="hud-inf-der">
+      <div class="tarjeta-telemetria">
+        <div class="sup-badge" id="hud-superficie">Grava</div>
+        <div class="fila-vel">
+          <span class="marcha" id="hud-marcha">1</span>
+          <div class="vel-bloque">
+            <span class="velocidad" id="hud-velocidad">0</span>
+            <span class="unidad">km/h</span>
+          </div>
+        </div>
+        <div class="barra-rpm"><div class="barra-rpm-relleno" id="hud-rpm"></div></div>
+        <div class="estado-extra">
+          <span id="hud-derrape" class="chip-derrape" hidden>DERRAPE</span>
+          <span id="hud-mando" class="chip-mando" hidden>🎮 Mando</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controles táctiles para móvil/tablet -->
+    <div id="controles-tactiles" class="controles-tactiles" hidden>
+      <div class="grupo-tactil-izq">
+        <button type="button" id="btn-t-izq" class="btn-tactil btn-dir" aria-label="Izquierda">◀</button>
+        <button type="button" id="btn-t-der" class="btn-tactil btn-dir" aria-label="Derecha">▶</button>
+      </div>
+      <div class="grupo-tactil-der">
+        <button type="button" id="btn-t-mano" class="btn-tactil btn-mano" aria-label="Freno de mano">MANO</button>
+        <button type="button" id="btn-t-freno" class="btn-tactil btn-freno" aria-label="Freno">FRENO</button>
+        <button type="button" id="btn-t-gas" class="btn-tactil btn-gas" aria-label="Acelerar">GAS</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Módulos compartidos de Mundos- (exponen window.Escenario, window.TexturasLib, etc.) -->
+  <script src="vendor/mundos/js/escenario-core.js"></script>
+  <script src="vendor/mundos/js/pradera-atlas.js"></script>
+  <script src="vendor/mundos/js/texturas-lib.js"></script>
+  <script src="vendor/mundos/js/catalogo-rpg.js"></script>
+  <script src="vendor/mundos/js/almacen.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
